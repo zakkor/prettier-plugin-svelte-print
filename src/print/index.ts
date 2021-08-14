@@ -1,4 +1,5 @@
 import { Doc, doc, FastPath, ParserOptions } from 'prettier';
+import { generate } from 'astring';
 import { formattableAttributes, selfClosingTags } from '../lib/elements';
 import { extractAttributes } from '../lib/extractAttributes';
 import { getText } from '../lib/getText';
@@ -640,8 +641,12 @@ export function print(path: FastPath, options: ParserOptions, print: PrintFn): D
             return concat([line, '{...', printJS(path, print, false, false, 'expression'), '}']);
     }
 
-    console.error(JSON.stringify(node, null, 4));
-    throw new Error('unknown node type: ' + node.type);
+    try {
+        return generate(node);
+    } catch (err) {
+        console.error(JSON.stringify(node, null, 4));
+        throw new Error('unknown node type: ' + node.type);
+    }
 }
 
 function printTopLevelParts(
